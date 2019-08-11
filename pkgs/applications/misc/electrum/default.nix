@@ -61,6 +61,7 @@ python3Packages.buildPythonApplication rec {
     tlslite-ng
 
     # plugins
+    ckcc-protocol
     keepkey
     trezor
     btchip
