@@ -1386,6 +1386,8 @@ in {
 
   applicationinsights = callPackage ../development/python-modules/applicationinsights { };
 
+  apply-defaults = callPackage ../development/python-modules/apply-defaults { };
+
   appnope = callPackage ../development/python-modules/appnope { };
 
   approvaltests = callPackage ../development/python-modules/approvaltests { };
