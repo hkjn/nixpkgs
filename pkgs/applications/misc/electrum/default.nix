@@ -1,4 +1,4 @@
-{ stdenv, fetchurl, fetchFromGitHub, wrapQtAppsHook, python3, python3Packages, zbar, secp256k1
+{ stdenv, fetchzip, fetchFromGitHub, wrapQtAppsHook, python3, python3Packages, zbar, secp256k1
 , enableQt ? !stdenv.isDarwin
 
 
@@ -15,7 +15,7 @@
 }:
 
 let
-  version = "3.3.8";
+  version = "c7346c1e";
 
   libsecp256k1_name =
     if stdenv.isLinux then "libsecp256k1.so.0"
@@ -31,7 +31,7 @@ let
     owner = "spesmilo";
     repo = "electrum";
     rev = version;
-    sha256 = "1di8ba77kgapcys0d7h5nx1qqakv3s60c6sp8skw8p69ramsl73c";
+    sha256 = "0n1ndx3afxhhxqsgr5w5cglkssw4sqxq6141fa88islqqx9xh7kw";
 
     extraPostFetch = ''
       mv $out ./all
@@ -44,9 +44,10 @@ python3Packages.buildPythonApplication {
   pname = "electrum";
   inherit version;
 
-  src = fetchurl {
-    url = "https://download.electrum.org/${version}/Electrum-${version}.tar.gz";
-    sha256 = "1g00cj1pmckd4xis8r032wmraiv3vd3zc803hnyxa2bnhj8z3bg2";
+  src = fetchzip {
+    # xx
+    url = "https://github.com/spesmilo/electrum/archive/c7346c1eb8f790ad71d14c634097fa67d2839ac5.zip";
+    sha256 = "0n1ndx3afxhhxqsgr5w5cglkssw4sqxq6141fa88islqqx9xh7kw";
   };
 
   postUnpack = ''
@@ -62,7 +63,10 @@ python3Packages.buildPythonApplication {
     aiohttp-socks
     dnspython
     ecdsa
+    jsonrpcclient
     jsonrpclib-pelix
+    jsonschema
+    jsonrpcserver
     matplotlib
     pbkdf2
     protobuf
