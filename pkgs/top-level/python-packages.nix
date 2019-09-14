@@ -1904,6 +1904,8 @@ in {
 
   jsonrpc-base = callPackage ../development/python-modules/jsonrpc-base { };
 
+  jsonrpcclient = callPackage ../development/python-modules/jsonrpcclient { };
+  
   jsonrpc-websocket = callPackage ../development/python-modules/jsonrpc-websocket { };
 
   onkyo-eiscp = callPackage ../development/python-modules/onkyo-eiscp { };
