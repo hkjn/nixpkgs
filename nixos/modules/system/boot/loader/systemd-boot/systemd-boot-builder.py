@@ -61,11 +61,24 @@ def write_loader_conf(profile: Optional[str], generation: int) -> None:
 
 
 def profile_path(profile: Optional[str], generation: int, name: str) -> str:
-    return os.readlink("%s/%s" % (system_dir(profile, generation), name))
+    p = "%s/%s" % (system_dir(profile, generation), name)
+    r = ''
+    try:
+        r = os.readlink(p)
+    except FileNotFoundError as e:
+         print('no such file ' + p)
+    return r
+
+    # return os.readlink("%s/%s" % (system_dir(profile, generation), name))
 
 
 def copy_from_profile(profile: Optional[str], generation: int, name: str, dry_run: bool = False) -> str:
+    # xx: the profile_path() throws error when trying to read non-existent 'kernel' file here:
+    #   return os.readlink("%s/%s" % (system_dir(profile, generation), name))
+    #   FileNotFoundError: [Errno 2] No such file or directory: '/nix/var/nix/profiles/system-profiles/test0-81-link/kernel'
     store_file_path = profile_path(profile, generation, name)
+    if not store_file_path:
+        return ''
     suffix = os.path.basename(store_file_path)
     store_dir = os.path.basename(os.path.dirname(store_file_path))
     efi_file_path = "/efi/nixos/%s-%s.efi" % (store_dir, suffix)
@@ -82,8 +95,13 @@ def describe_generation(generation_dir: str) -> str:
         nixos_version = "Unknown"
 
     kernel_dir = os.path.dirname(os.path.realpath("%s/kernel" % generation_dir))
-    module_dir = glob.glob("%s/lib/modules/*" % kernel_dir)[0]
-    kernel_version = os.path.basename(module_dir)
+    # module_dir = glob.glob("%s/lib/modules/*" % kernel_dir)[0]
+    # kernel_version = os.path.basename(module_dir)
+    r = glob.glob("%s/lib/modules/*" % kernel_dir)
+    kernel_version = 'UNK'
+    if len(r) > 0:
+        module_dir = r[0]
+        kernel_version = os.path.basename(module_dir)
 
     build_time = int(os.path.getctime(generation_dir))
     build_date = datetime.datetime.fromtimestamp(build_time).strftime('%F')
@@ -100,6 +118,8 @@ def write_entry(profile: Optional[str], generation: int, machine_id: str) -> Non
     initrd = copy_from_profile(profile, generation, "initrd")
     try:
         append_initrd_secrets = profile_path(profile, generation, "append-initrd-secrets")
+        if not append_initrd_secrets:
+            return None
         subprocess.check_call([append_initrd_secrets, "@efiSysMountPoint@%s" % (initrd)])
     except FileNotFoundError:
         pass
